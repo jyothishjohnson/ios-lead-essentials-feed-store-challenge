@@ -40,3 +40,26 @@ public final class CoreDataFeedStore: FeedStore {
 		fatalError("Must be implemented")
 	}
 }
+
+@objc(ManagedCache)
+internal class ManagedCache: NSManagedObject {
+	@NSManaged var timestamp: Date
+	@NSManaged var feed: NSOrderedSet
+
+	var localFeed: [LocalFeedImage] {
+		return feed.compactMap { ($0 as? ManagedFeedImage)?.local }
+	}
+}
+
+@objc(ManagedFeedImage)
+internal class ManagedFeedImage: NSManagedObject {
+	@NSManaged var id: UUID
+	@NSManaged var imageDescription: String?
+	@NSManaged var location: String?
+	@NSManaged var url: URL
+	@NSManaged var cache: ManagedCache
+
+	var local: LocalFeedImage {
+		return LocalFeedImage(id: id, description: imageDescription, location: location, url: url)
+	}
+}
